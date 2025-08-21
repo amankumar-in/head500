@@ -57,6 +57,7 @@ document.querySelector('.contact-form').addEventListener('submit', function(e) {
     // Get form data
     const formData = new FormData(this);
     const submitBtn = this.querySelector('.submit-btn');
+    const formStatus = document.getElementById('form-status');
     const originalText = submitBtn.textContent;
     
     // Simple validation with enhanced feedback
@@ -87,8 +88,17 @@ document.querySelector('.contact-form').addEventListener('submit', function(e) {
         submitBtn.textContent = 'Sending...';
         submitBtn.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
         
-        // Simulate API call
-        setTimeout(() => {
+        // Submit to Google Form
+        const form = document.getElementById('google-form');
+        const formAction = form.getAttribute('action');
+        
+        // Use fetch API to submit the form
+        fetch(formAction, {
+            method: 'POST',
+            mode: 'no-cors', // Important for cross-origin requests to Google
+            body: new FormData(form)
+        })
+        .then(() => {
             // Show success state
             submitBtn.classList.remove('loading');
             submitBtn.classList.add('success');
@@ -99,12 +109,24 @@ document.querySelector('.contact-form').addEventListener('submit', function(e) {
             
             // Reset form after 4 seconds
             setTimeout(() => {
-                this.reset();
+                form.reset();
                 submitBtn.classList.remove('success');
                 submitBtn.textContent = originalText;
                 submitBtn.style.background = 'var(--gradient-accent)';
             }, 4000);
-        }, 1500);
+        })
+        .catch(error => {
+            // Show error state
+            submitBtn.classList.remove('loading');
+            formStatus.textContent = 'There was an error submitting the form. Please try again.';
+            formStatus.style.color = '#ef4444';
+            
+            // Reset button after 4 seconds
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.style.background = 'var(--gradient-accent)';
+            }, 4000);
+        });
     }
 });
 
