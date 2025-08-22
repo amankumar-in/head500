@@ -461,3 +461,48 @@ const counterObserver = new IntersectionObserver((entries) => {
 document.querySelectorAll('[data-target]').forEach(el => {
     counterObserver.observe(el);
 });
+
+// Theme Switcher
+function initThemeSwitcher() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+    const root = document.documentElement;
+    
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    
+    if (savedTheme === 'light') {
+        root.classList.add('light-theme');
+    }
+    
+    function toggleTheme() {
+        // Disable transitions temporarily
+        document.body.classList.add('disable-transitions');
+        
+        if (root.classList.contains('light-theme')) {
+            root.classList.remove('light-theme');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            root.classList.add('light-theme');
+            localStorage.setItem('theme', 'light');
+        }
+        
+        void document.body.offsetHeight;
+        
+        // Re-enable transitions
+        requestAnimationFrame(() => {
+            document.body.classList.remove('disable-transitions');
+        });
+    }
+    
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    if (mobileThemeToggle) {
+        mobileThemeToggle.addEventListener('click', toggleTheme);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initThemeSwitcher);
+
+
